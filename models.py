@@ -1,17 +1,20 @@
 from enum import unique
 import string
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
 from sqlalchemy.orm import relationship
 
 from database import Base
+
 
 
 class Project(Base):
     __tablename__ = "projects"
 
     project_id = Column(Integer, primary_key=True, index=True)
-    project_name = Column(String, unique=True, nullable=False, index=True)
-    
+    project_name = Column(String, nullable=False, index=True)
+    token = Column(String)
+    port = Column(String)
+    ip = Column(String)
     experiments = relationship(
         "Experiment", back_populates="project", cascade="delete, merge, save-update")
 
@@ -24,7 +27,7 @@ class Experiment(Base):
     
     experiment_config_path = Column(String)
 
-    token = Column(String,  unique=True)
+    token = Column(String)
 
 
     project_id = Column(Integer, ForeignKey(

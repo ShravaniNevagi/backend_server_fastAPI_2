@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 import models
+import crud
 
 from database import SessionLocal, engine
 
@@ -58,8 +59,8 @@ def root():
   
 
 
-@app.post("/register")
-def client_details(info : Info):
+@app.post("/register", status_code=status.HTTP_200_OK)
+def client_details(info : Info,db: Session = Depends(get_db), ):
     details = Info(**info.dict())
     payload ={'port' : details.port, 'ipaddress':details.ipaddress, 'token': details.token, 'client_name':details.client_name }
 
@@ -77,6 +78,16 @@ def client_details(info : Info):
     if r.status_code == 200:
         z = zipfile.ZipFile(io.BytesIO(r.content))
 
+        for name in z.namelist():
+            n = name
+        # print(n)
+        folder, projectname, experimentname, file = n.split('/')
+        # print(projectname)
+        # print(experimentname)
+        path = f'{folder}/{projectname}/{experimentname}'
+        crud.db_entry( db=db,experimentname = experimentname,path=path, projectname = projectname,token =token, port = port,ip=ip)
+
+
 
         z.extractall()
 
@@ -85,15 +96,28 @@ def client_details(info : Info):
 
     return r.status_code
 
-#create 2 tables in a new db projects and experiments
-#project - id, name, token, ip port from token
-#experiment - name, project id, token, path to exp
-#get projects
-#get experiments
-#upload data file
+@app.post("/upload-data-file", status_code=status.HTTP_200_OK)
+async def upload_data_file(token: str, files: List[UploadFile] = File(...), db: Session = Depends(get_db)):
 
-#zip model.h5 and loader.py
-#data.npz
+    for file in files:
+
+        crud.save_file(db=db, token=token, uploaded_file=file)
+    
+    return {"Result": "OK", "filenames": [file.filename for file in files]}
+
+
+
+@app.get("/projects")
+def read_projects(db: Session = Depends(get_db)):
+    projects = crud.get_projects(db)
+    return projects
+
+@app.get("/experiments/")
+def read_experiments(db: Session = Depends(get_db)):
+    experiment = crud.get_experiments(db)
+    return experiment
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8080)
