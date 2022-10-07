@@ -29,14 +29,13 @@ def save_file(db: Session, token: str, uploaded_file: File(...)):
     project_name = db.query(models.Project).filter(
         models.Project.token == experiment.token).first()
     project_name = project_name.project_name
-
-    file_extension = pathlib.Path(f'{uploaded_file}').suffix
     
     file_location = f"projects/{project_name}/{experiment_name}/{uploaded_file.filename}"
+    file_extension = pathlib.Path(f'{file_location}').suffix
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
     if file_extension == '.npz':
-        os.rename(rf'{file_location}',rf'projects/{project_name}/{experiment_name}/data.npz')
+        os.rename(file_location, f'projects/{project_name}/{experiment_name}/data.npz')
 
     return "file uploaded"
 
