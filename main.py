@@ -66,11 +66,11 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
 
     endpoint = 'client_registration'
     token = details.token
-    if token.count("+") != 2:
+    if token.count("+") != 3:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="invalid token type")
     
-    t, ip, port = token.split('+')
+    t3,t4, ip, port = token.split('+')
     url = f'http://{ip}:{port}/{endpoint}'
     r = requests.post(url, json = payload, data = payload)
     
