@@ -15,7 +15,7 @@ def db_entry(db: Session, experimentname:str,projectname :str,token:str, port: s
 
     id = db_entry_project.project_id
     
-    db_entry_exp = models.Experiment(project_id=id ,experiment_name = experimentname,token = token,experiment_config_path = path)
+    db_entry_exp = models.Experiment(project_id=id ,experiment_name = experimentname,token = token,experiment_path = path)
     db.add(db_entry_exp)
     db.commit()
     db.refresh(db_entry_exp)

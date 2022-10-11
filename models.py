@@ -25,7 +25,7 @@ class Experiment(Base):
     experiment_no = Column(Integer, primary_key=True, index=True)
     experiment_name = Column(String, nullable=False, index=True)
     
-    experiment_config_path = Column(String)
+    experiment_path = Column(String)
 
     token = Column(String)
 

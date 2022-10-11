@@ -66,11 +66,11 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
 
     endpoint = 'client_registration'
     token = details.token
-    if token.count("+") != 2:
+    if token.count("+") != 3:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="invalid token type")
     
-    t, ip, port = token.split('+')
+    t3,t4, ip, port = token.split('+')
     url = f'http://{ip}:{port}/{endpoint}'
     r = requests.post(url, json = payload, data = payload)
     
@@ -85,6 +85,13 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
         # print(projectname)
         # print(experimentname)
         path = f'{folder}/{projectname}/{experimentname}'
+
+        exp_path = db.query(models.Experiment).filter(
+        models.Experiment.experiment_path == path).first()
+        if exp_path:
+        
+            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="already registered for this experiment")
+
         crud.db_entry( db=db,experimentname = experimentname,path=path, projectname = projectname,token =token, port = port,ip=ip)
 
 
