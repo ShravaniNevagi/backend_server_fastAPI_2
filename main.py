@@ -64,6 +64,7 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
     details = Info(**info.dict())
     payload ={'port' : details.port, 'ipaddress':details.ipaddress, 'token': details.token, 'client_name':details.client_name }
 
+    clientname = details.client_name
     endpoint = 'client_registration'
     token = details.token
     if token.count("+") != 3:
@@ -92,7 +93,7 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
         
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="already registered for this experiment")
 
-        crud.db_entry( db=db,experimentname = experimentname,path=path, projectname = projectname,token =token, port = port,ip=ip)
+        crud.db_entry( db=db,experimentname = experimentname,path=path, projectname = projectname,token =token, port = port,ip=ip, clientname= clientname)
 
 
 
@@ -124,6 +125,9 @@ def read_experiments(db: Session = Depends(get_db)):
     experiment = crud.get_experiments(db)
     return experiment
 
+
+
+#data quality endpoint
 
 
 if __name__ == "__main__":

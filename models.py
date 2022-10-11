@@ -33,4 +33,6 @@ class Experiment(Base):
     project_id = Column(Integer, ForeignKey(
         "projects.project_id"), nullable=False)
 
+    clientname = Column(String)
+
     project = relationship("Project", back_populates="experiments")

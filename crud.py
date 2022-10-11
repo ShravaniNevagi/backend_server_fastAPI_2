@@ -7,7 +7,7 @@ import os
 from fastapi import File, UploadFile
 import pathlib
 
-def db_entry(db: Session, experimentname:str,projectname :str,token:str, port: str ,ip: str,path:str):
+def db_entry(db: Session, experimentname:str,projectname :str,token:str, port: str ,ip: str,path:str, clientname:str):
     db_entry_project = models.Project(project_name = projectname,token = token,port = port,ip = ip)
     db.add(db_entry_project)
     db.commit()
@@ -15,7 +15,7 @@ def db_entry(db: Session, experimentname:str,projectname :str,token:str, port: s
 
     id = db_entry_project.project_id
     
-    db_entry_exp = models.Experiment(project_id=id ,experiment_name = experimentname,token = token,experiment_path = path)
+    db_entry_exp = models.Experiment(project_id=id ,experiment_name = experimentname,token = token,experiment_path = path,clientname=clientname)
     db.add(db_entry_exp)
     db.commit()
     db.refresh(db_entry_exp)
