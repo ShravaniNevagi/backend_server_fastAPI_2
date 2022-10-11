@@ -85,6 +85,13 @@ def client_details(info : Info,db: Session = Depends(get_db), ):
         # print(projectname)
         # print(experimentname)
         path = f'{folder}/{projectname}/{experimentname}'
+
+        exp_path = db.query(models.Experiment).filter(
+        models.Experiment.experiment_path == path).first()
+        if exp_path:
+        
+            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="already registered for this experiment")
+
         crud.db_entry( db=db,experimentname = experimentname,path=path, projectname = projectname,token =token, port = port,ip=ip)
 
 
