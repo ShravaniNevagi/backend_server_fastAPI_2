@@ -51,3 +51,13 @@ def get_projects_by_token(db: Session,token:str):
 
 def get_experiments_by_token(db: Session,token:str):
     return db.query(models.Experiment).filter(models.Experiment.token == token).all()
+
+def get_client_name(db: Session,token:str):
+    client = db.query(models.Experiment).filter(models.Experiment.token == token).first()
+    cllientname=client.clientname
+    return cllientname
+
+def get_exp_path(db: Session,token:str):
+    client = db.query(models.Experiment).filter(models.Experiment.token == token).first()
+    path=client.experiment_path
+    return path

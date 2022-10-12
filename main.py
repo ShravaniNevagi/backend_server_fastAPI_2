@@ -1,5 +1,6 @@
 
 import json
+from math import frexp
 from typing import List
 from pydantic import BaseModel
 import requests
@@ -10,6 +11,7 @@ from fastapi import Depends, FastAPI, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 import models
+import docker
 import crud
 
 from database import SessionLocal, engine
@@ -22,6 +24,7 @@ from fastapi import Request
 models.Base.metadata.create_all(bind=engine)
 import zipfile, io
 from typing import Set, Union
+import os
 
 app = FastAPI()
 
@@ -138,19 +141,55 @@ def read_experiments_by_token(token:str,db: Session = Depends(get_db)):
     return experiment
 
 
-class Image(BaseModel):
-    url: str
-    name: str
+class test2(BaseModel):
+    number_of_epochs:int
+    batch_size:int
+    ipaddress:str
+    port:str
+    experiment_name:str
+    run_name:str
+    run_path:str
+    experiment_path:str
+    number_of_rounds: int
+    number_of_clients:int
 
 
 class test(BaseModel):
-    name:str
-    keys : Union[Image, None] = None
+    token:str
+    run_name:str
+    runs_config : Union[test2, None] = None
 
 @app.post("/start_client/")
-async def start_client(info : test):
+async def start_client(info : test,db: Session = Depends(get_db)):
     details = test(**info.dict())
-    return {'n' : details.name, 'k':details.keys }
+    runs_config_temp = details.runs_config
+    token = details.token
+    client_name = crud.get_client_name(db=db,token=token)
+    
+
+    exp_path = crud.get_exp_path(db=db,token=token)
+    run_name= details.run_name
+    dir = f'{exp_path}/runs/{run_name}'
+    os.makedirs(dir)
+    FILE = dir + '/runs_config.json'
+
+    runs_config = {}
+    for i in runs_config_temp:
+        runs_config[i[0]]= i[1]
+    runs_config['client_name']=client_name
+    DATA = json.dumps(runs_config)
+    with open(FILE, mode='w') as f:
+        json.dump(runs_config,f)
+
+    #client = docker.from_env()
+    #container = client.containers.run(image = 'flower_tensorflow_client',network='host', environment = ['RUN_PATH=runs/'+run_name+'/'],volumes = {exp_path:{'bind':'/app/dir/','mode': 'rw'}},detach=True,remove=True)
+    
+
+
+
+
+    # docker run --rm --network host -e RUN_PATH='runs/run1/' -v /home/sashreek/temp/experiment1:/app/dir/ client
+    return 200
 
 
 
