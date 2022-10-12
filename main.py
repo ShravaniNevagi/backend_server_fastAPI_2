@@ -1,4 +1,5 @@
 
+import json
 from typing import List
 from pydantic import BaseModel
 import requests
@@ -16,11 +17,11 @@ from database import SessionLocal, engine
 
 from fastapi import File, UploadFile
 from fastapi.responses import FileResponse
-
+from fastapi import Request
 
 models.Base.metadata.create_all(bind=engine)
 import zipfile, io
-
+from typing import Set, Union
 
 app = FastAPI()
 
@@ -51,6 +52,7 @@ class Info(BaseModel):
     ipaddress: str
     token: str
     client_name: str
+
     
 
 @app.get("/")
@@ -125,10 +127,36 @@ def read_experiments(db: Session = Depends(get_db)):
     experiment = crud.get_experiments(db)
     return experiment
 
+@app.get("/projects/{token}")
+def read_projects_by_token(token:str, db: Session = Depends(get_db)):
+    project = crud.get_projects_by_token(db=db,token=token)
+    return project
+
+@app.get("/experiments/{token}")
+def read_experiments_by_token(token:str,db: Session = Depends(get_db)):
+    experiment = crud.get_experiments_by_token(db=db, token=token)
+    return experiment
+
+
+class Image(BaseModel):
+    url: str
+    name: str
+
+
+class test(BaseModel):
+    name:str
+    keys : Union[Image, None] = None
+
+@app.post("/start_client/")
+async def start_client(info : test):
+    details = test(**info.dict())
+    return {'n' : details.name, 'k':details.keys }
+
+
 
 
 #data quality endpoint
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8080)
+    uvicorn.run('main:app', host="localhost", port=8080, reload=True)
