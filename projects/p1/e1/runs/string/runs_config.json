@@ -1,1 +1,0 @@
-{"number_of_epochs": 0, "batch_size": 0, "ipaddress": "string", "port": "string", "experiment_name": "string", "run_name": "string", "run_path": "string", "experiment_path": "string", "number_of_rounds": 0, "number_of_clients": 0, "client_name": "c-1"}

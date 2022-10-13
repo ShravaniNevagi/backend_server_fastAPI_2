@@ -167,10 +167,13 @@ async def start_client(info : test,db: Session = Depends(get_db)):
     client_name = crud.get_client_name(db=db,token=token)
     
 
-    exp_path = crud.get_exp_path(db=db,token=token)
+    exp_path = os.getcwd() + '/'+crud.get_exp_path(db=db,token=token)
     run_name= details.run_name
     dir = f'{exp_path}/runs/{run_name}'
-    os.makedirs(dir)
+    try:
+        os.makedirs(dir)
+    except:
+        pass
     FILE = dir + '/runs_config.json'
 
     runs_config = {}
@@ -181,8 +184,8 @@ async def start_client(info : test,db: Session = Depends(get_db)):
     with open(FILE, mode='w') as f:
         json.dump(runs_config,f)
 
-    #client = docker.from_env()
-    #container = client.containers.run(image = 'flower_tensorflow_client',network='host', environment = ['RUN_PATH=runs/'+run_name+'/'],volumes = {exp_path:{'bind':'/app/dir/','mode': 'rw'}},detach=True,remove=True)
+    client = docker.from_env()
+    container = client.containers.run(image = 'flower_tensorflow_client',network='host', environment = ['RUN_PATH=runs/'+run_name+'/'],volumes = {exp_path:{'bind':'/app/dir/','mode': 'rw'}},detach=True,auto_remove = True)
     
 
 

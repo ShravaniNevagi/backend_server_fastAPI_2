@@ -1,0 +1,1 @@
+{"number_of_epochs": 1, "batch_size": 32, "ipaddress": "localhost", "port": "8090", "experiment_name": "exp1", "run_name": "run1", "run_path": "projects/mnist/exp1/runs/run1", "experiment_path": "projects/mnist/exp1", "number_of_rounds": 5, "number_of_clients": 2, "client_name": "client2"}
