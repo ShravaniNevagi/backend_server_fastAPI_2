@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 import models
 import docker
 import crud
+import schemas 
 
 from database import SessionLocal, engine
 
@@ -56,7 +57,6 @@ class Info(BaseModel):
     token: str
     client_name: str
 
-    
 
 @app.get("/")
 def root():
@@ -120,9 +120,10 @@ async def upload_data_file(token: str, files: List[UploadFile] = File(...), db: 
 
 
 
-@app.get("/projects")
+@app.get("/projects", response_model=List[schemas.Project])
 def read_projects(db: Session = Depends(get_db)):
     projects = crud.get_projects(db)
+    print(projects)
     return projects
 
 @app.get("/experiments/")
@@ -130,7 +131,7 @@ def read_experiments(db: Session = Depends(get_db)):
     experiment = crud.get_experiments(db)
     return experiment
 
-@app.get("/projects/{token}")
+@app.get("/projects/{token}", response_model=List[schemas.Project])
 def read_projects_by_token(token:str, db: Session = Depends(get_db)):
     project = crud.get_projects_by_token(db=db,token=token)
     return project
